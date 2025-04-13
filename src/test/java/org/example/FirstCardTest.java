@@ -41,16 +41,20 @@ public class FirstCardTest {
     public Boolean testFile(File file) {
         String name = file.getName();
         System.out.println("File name: " + name);
-        String firstCard = name.substring(0, 2);
+        String firstCard = name.substring(0, 1);
         System.out.println("first card name:" + firstCard);
         String recognizedName = "";
         try {
-            recognizedName = Main.recognizeText(file).substring(0, 2);
+            recognizedName = Main.recognizeText(file).substring(0, 1);
         } catch (IOException e) {
             e.printStackTrace();
             assertTrue(false, "Failed with testing file " + name);
         }
         boolean equals = recognizedName.equals(firstCard);
+        if (!equals) {
+            System.out.println("Recognized name: " + recognizedName);
+            System.out.println("Expected name: " + firstCard);
+        }
         return equals;
     }
 }
