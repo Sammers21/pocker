@@ -38,7 +38,7 @@ public class Main {
     }
 
     record AreaRecognizer(String symbol, XYNColors[] coordinates) {
-        public boolean recognize(BufferedImage img) {
+        public boolean recognize(BufferedImage img) throws IOException {
             for (XYNColors coordinate : coordinates) {
                 int x = coordinate.x;
                 int y = coordinate.y;
@@ -59,6 +59,12 @@ public class Main {
                     System.out.println("Unrecognized symbol: " + symbol + " at coordinate: "
                             + coordinate
                             + " recognized color: " + p);
+                    BufferedImage debugImage = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+                    Graphics g = debugImage.getGraphics();
+                    g.drawImage(img, 0, 0, null);
+                    g.dispose();
+                    debugImage.setRGB(x, y, Color.GREEN.getRGB());
+                    saveImg(debugImage, "unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
                     return false;
                 }
             }
@@ -122,10 +128,10 @@ public class Main {
             new AreaRecognizer("8",
                     new XYNColors[] {
                             new XYNColors(8, 2, BLACK_N_RED),
-                            new XYNColors(3, 20, BLACK_N_RED),
+                            new XYNColors(3, 19, BLACK_N_RED),
                             new XYNColors(13, 20, BLACK_N_RED),
-                            new XYNColors(3, 7, BLACK_N_RED),
-                            new XYNColors(2, 11, Set.of(CardColor.WHITE)),
+                            new XYNColors(2, 7, BLACK_N_RED),
+                            new XYNColors(2, 10, Set.of(CardColor.WHITE)),
                     }),
             new AreaRecognizer("9",
                     new XYNColors[] {
@@ -168,7 +174,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/4hJhQc.png");
+        File f = new File("./imgs_marked/8s7h5c.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
@@ -190,7 +196,7 @@ public class Main {
             return rank + suit;
         }
 
-        public Boolean valid() {
+        public Boolean valid() throws IOException {
             return VALID_CARD.recognize(image);
         }
 
@@ -252,6 +258,7 @@ public class Main {
                 saveImg(cardImg, "card_" + cardNum + ".png");
                 System.out.println("Valid card: #" + cardNum);
                 res.add(card);
+                break;
             } else {
                 System.out.println("Invalid card: #" + cardNum);
             }
