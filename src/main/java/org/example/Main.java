@@ -18,15 +18,16 @@ public class Main {
         ANY;
 
         public static CardColor pix(Color pix) {
+            int blackDiff = 20;
             if (pix.getRed() >= 90 && (pix.getRed() - pix.getGreen()) > 40
                     && (pix.getRed() - pix.getBlue()) > 40) {
                 return RED;
             } else if (pix.getRed() >= 250 && pix.getGreen() >= 250
                     && pix.getBlue() >= 250 || (pix.getRed() == 120 && pix.getGreen() == 120 && pix.getBlue() == 120)) {
                 return WHITE;
-            } else if (Math.abs(pix.getRed() - pix.getGreen()) <= 10
-                    && Math.abs(pix.getRed() - pix.getBlue()) <= 10
-                    && Math.abs(pix.getRed() - pix.getBlue()) <= 10 && pix.getRed() < 170) {
+            } else if (Math.abs(pix.getRed() - pix.getGreen()) <= blackDiff
+                    && Math.abs(pix.getRed() - pix.getBlue()) <= blackDiff
+                    && Math.abs(pix.getRed() - pix.getBlue()) <= blackDiff && pix.getRed() < 170) {
                 return BLACK;
             } else {
                 return ANY;
@@ -181,7 +182,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/2c9s9d.png");
+        File f = new File("./imgs_marked/4sJdKdKc.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
@@ -275,19 +276,6 @@ public class Main {
                         cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
                     }
                 } while (dColor == CardColor.BLACK && iterations < 20);
-                // var p = new Color(cardImg.getRGB(0, CARD_HEIGHT / 2));
-                // var dColor = CardColor.pix(p);
-                // System.out.println();
-                // while (dColor == CardColor.BLACK
-                // && iterations < 20) {
-                // x++;
-                // iterations++;
-                // cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
-                // p = new Color(cardImg.getRGB(0, CARD_HEIGHT / 2));
-                // dColor = CardColor.pix(p);
-                // }
-                // x--;
-                // cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
             }
             var card = new Card(cardImg, "card_" + cardNum);
             if (card.valid()) {
