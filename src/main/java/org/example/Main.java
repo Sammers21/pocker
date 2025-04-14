@@ -24,7 +24,7 @@ public class Main {
             } else if (pix.getRed() >= 250 && pix.getGreen() >= 250
                     && pix.getBlue() >= 250) {
                 return WHITE;
-            } else if (Math.abs(pix.getRed()- pix.getGreen()) < 10
+            } else if (Math.abs(pix.getRed() - pix.getGreen()) < 10
                     && Math.abs(pix.getRed() - pix.getBlue()) < 10
                     && Math.abs(pix.getRed() - pix.getBlue()) < 10 && pix.getRed() < 170) {
                 return BLACK;
@@ -43,17 +43,21 @@ public class Main {
                 int x = coordinate.x;
                 int y = coordinate.y;
                 if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight()) {
-                    System.out.println("Coordinate out of bounds: x=" + x + ", y=" + y + " for symbol: " + symbol);
+                    System.out.println("Coordinate out of bounds: x=" + x + ", y=" + y
+                            + " for symbol: " + symbol);
                     return false;
                 }
                 Color pix = new Color(img.getRGB(x, y));
-                System.out.println("Pixel color: " + pix + " for symbol=" + symbol + " at coordinate: " + coordinate);
+                System.out.println("Pixel color: " + pix + " for symbol=" + symbol + " at coordinate: "
+                        + coordinate);
                 var p = CardColor.pix(pix);
                 if (coordinate.colors.contains(p)) {
-                    System.out.println("Recognized symbol: " + symbol + " at coordinate: " + coordinate
-                            + " recognized color: " + p);
+                    System.out.println(
+                            "Recognized symbol: " + symbol + " at coordinate: " + coordinate
+                                    + " recognized color: " + p);
                 } else {
-                    System.out.println("Unrecognized symbol: " + symbol + " at coordinate: " + coordinate
+                    System.out.println("Unrecognized symbol: " + symbol + " at coordinate: "
+                            + coordinate
                             + " recognized color: " + p);
                     return false;
                 }
@@ -160,20 +164,20 @@ public class Main {
             new AreaRecognizer("A",
                     new XYNColors[] {
                             new XYNColors(8, 15, BLACK_N_RED),
-                    })
-            // new AreaRecognizer("A", new XYNColors[] { new XYNColors(0, 0) },
-            // Set.of(CardColor.BLACK, CardColor.RED)),
+                    }),
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/4s9c7s.png");
+        File f = new File("./imgs_marked/4hJhQc.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
     static AreaRecognizer[] CARD_SUITS = {
             new AreaRecognizer("h",
-                    new XYNColors[] { new XYNColors(16, 19, Set.of(CardColor.RED)),
-                            new XYNColors(0, 1, Set.of(CardColor.RED)) }),
+                    new XYNColors[] {
+                            new XYNColors(16, 19, Set.of(CardColor.RED)),
+                            new XYNColors(16, 3, Set.of(CardColor.WHITE))
+                    }),
             new AreaRecognizer("d", new XYNColors[] { new XYNColors(16, 1, Set.of(CardColor.RED)), }),
             new AreaRecognizer("c", new XYNColors[] { new XYNColors(13, 2, Set.of(CardColor.BLACK)), }),
             new AreaRecognizer("s", new XYNColors[] { new XYNColors(9, 12, Set.of(CardColor.BLACK)), }),
