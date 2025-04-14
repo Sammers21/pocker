@@ -65,11 +65,7 @@ public class Main {
                     g.dispose();
                     debugImage.setRGB(x, y, Color.GREEN.getRGB());
                     // create debug dir if not exists
-                    File debugDir = new File("./debug");
-                    if (!debugDir.exists()) {
-                        debugDir.mkdir();
-                    }
-                    saveImg(debugImage, "./debug/unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
+                    saveImg(debugImage, "unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
                     return false;
                 }
             }
@@ -77,7 +73,7 @@ public class Main {
         }
     }
 
-    static int CARD_WIDTH = 63, CARD_HEIGHT = 87, X_OFFSET = 8, FIRST_CARD_X = 143, FIRST_CARD_Y = 586;
+    static int CARD_WIDTH = 63, CARD_HEIGHT = 87, X_OFFSET = 9, FIRST_CARD_X = 143, FIRST_CARD_Y = 586;
     static int SUIT_X = 26, SUIT_Y = 48, SUIT_WIDTH = 32, SUIT_HEIGHT = 32;
     static int RANK_X = 9, RANK_Y = 6, RANK_WIDTH = 24, RANK_HEIGHT = 24;
     static Set<CardColor> BLACK_N_RED = Set.of(CardColor.BLACK, CardColor.RED);
@@ -97,7 +93,7 @@ public class Main {
                     new XYNColors[] {
                             new XYNColors(3, 2, BLACK_N_RED),
                             new XYNColors(7, 10, BLACK_N_RED),
-                            new XYNColors(14, 2, BLACK_N_RED),
+                            new XYNColors(13, 2, BLACK_N_RED),
                             new XYNColors(14, 16, BLACK_N_RED),
                             new XYNColors(2, 7, Set.of(CardColor.WHITE)),
                     }),
@@ -138,7 +134,7 @@ public class Main {
                             new XYNColors(3, 19, BLACK_N_RED),
                             new XYNColors(13, 20, BLACK_N_RED),
                             new XYNColors(2, 7, BLACK_N_RED),
-                            new XYNColors(2, 10, Set.of(CardColor.WHITE)),
+                            new XYNColors(1, 10, Set.of(CardColor.WHITE)),
                     }),
             new AreaRecognizer("9",
                     new XYNColors[] {
@@ -181,7 +177,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/7s10d6s.png");
+        File f = new File("./imgs_marked/Jc8c3s.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
@@ -260,6 +256,12 @@ public class Main {
             int y = FIRST_CARD_Y;
             System.out.println("Splitting card #" + (i + 1) + " at coordinates: x=" + x + ", y=" + y);
             BufferedImage cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
+            int iterations = 0;
+            while (CardColor.pix(new Color(cardImg.getRGB(0, CARD_HEIGHT / 2))) == CardColor.BLACK && iterations < 10) {
+                x++;
+                iterations++;
+                cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
+            }
             var card = new Card(cardImg, "card_" + cardNum);
             if (card.valid()) {
                 saveImg(cardImg, "card_" + cardNum + ".png");
@@ -273,7 +275,11 @@ public class Main {
     }
 
     public static void saveImg(BufferedImage img, String name) throws IOException {
-        File outputfile = new File(name);
+        File debugDir = new File("./debug");
+        if (!debugDir.exists()) {
+            debugDir.mkdir();
+        }
+        File outputfile = new File("./debug/" +name);
         ImageIO.write(img, "png", outputfile);
     }
 }
