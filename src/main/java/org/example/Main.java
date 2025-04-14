@@ -119,6 +119,7 @@ public class Main {
                     new XYNColors[] {
                             new XYNColors(4, 5, BLACK_N_RED),
                             new XYNColors(10, 2, BLACK_N_RED),
+                            new XYNColors(14, 15, BLACK_N_RED),
                             new XYNColors(9, 10, BLACK_N_RED),
                             new XYNColors(14, 7, Set.of(CardColor.WHITE)),
                     }),
