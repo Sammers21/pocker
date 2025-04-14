@@ -189,7 +189,7 @@ public class Main {
                             new XYNColors(16, 3, Set.of(CardColor.WHITE))
                     }),
             new AreaRecognizer("d", new XYNColors[] { new XYNColors(15, 2, Set.of(CardColor.RED)), }),
-            new AreaRecognizer("c", new XYNColors[] { new XYNColors(13, 2, Set.of(CardColor.BLACK)), }),
+            new AreaRecognizer("c", new XYNColors[] { new XYNColors(12, 2, Set.of(CardColor.BLACK)), }),
             new AreaRecognizer("s", new XYNColors[] { new XYNColors(9, 12, Set.of(CardColor.BLACK)), }),
     };
 
