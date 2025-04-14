@@ -12,10 +12,7 @@ import java.util.Set;
 public class Main {
 
     enum CardColor {
-        WHITE,
-        RED,
-        BLACK,
-        ANY;
+        WHITE, RED, BLACK, ANY;
 
         public static CardColor pix(Color pix) {
             int blackDiff = 20;
@@ -44,29 +41,11 @@ public class Main {
                 int x = coordinate.x;
                 int y = coordinate.y;
                 if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight()) {
-                    System.out.println("Coordinate out of bounds: x=" + x + ", y=" + y
-                            + " for symbol: " + symbol);
                     return false;
                 }
                 Color pix = new Color(img.getRGB(x, y));
-                System.out.println("Pixel color: " + pix + " for symbol=" + symbol + " at coordinate: "
-                        + coordinate);
                 var p = CardColor.pix(pix);
-                if (coordinate.colors.contains(p)) {
-                    System.out.println(
-                            "Recognized symbol: " + symbol + " at coordinate: " + coordinate
-                                    + " recognized color: " + p);
-                } else {
-                    System.out.println("Unrecognized symbol: " + symbol + " at coordinate: "
-                            + coordinate
-                            + " recognized color: " + p);
-                    BufferedImage debugImage = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
-                    Graphics g = debugImage.getGraphics();
-                    g.drawImage(img, 0, 0, null);
-                    g.dispose();
-                    debugImage.setRGB(x, y, Color.GREEN.getRGB());
-                    // create debug dir if not exists
-                    saveImg(debugImage, "unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
+                if (!coordinate.colors.contains(p)) {
                     return false;
                 }
             }
@@ -197,7 +176,7 @@ public class Main {
             new AreaRecognizer("s", new XYNColors[] { new XYNColors(9, 12, Set.of(CardColor.BLACK)), }),
     };
 
-    record Card(BufferedImage image, String name) {
+    record Card(BufferedImage image) {
         public String recognizeName() throws IOException {
             var suit = recognizeSuit();
             var rank = recognizeRank();
@@ -210,7 +189,6 @@ public class Main {
 
         private String recognizeSuit() throws IOException {
             var suit = image.getSubimage(SUIT_X, SUIT_Y, SUIT_WIDTH, SUIT_HEIGHT);
-            saveImg(suit, name + "_suit.png");
             for (var cardSuit : CARD_SUITS) {
                 if (cardSuit.recognize(suit)) {
                     return cardSuit.symbol;
@@ -221,7 +199,6 @@ public class Main {
 
         private String recognizeRank() throws IOException {
             var rank = image.getSubimage(RANK_X, RANK_Y, RANK_WIDTH, RANK_HEIGHT);
-            saveImg(rank, name + "_rank.png");
             for (var cardNumber : CARD_NUMBERS) {
                 if (cardNumber.recognize(rank)) {
                     return cardNumber.symbol;
@@ -234,17 +211,10 @@ public class Main {
     public static String recognizeText(File imageFile) throws IOException {
         var img = ImageIO.read(imageFile);
         var cards = splitIntoCards(img);
-        if (cards.size() == 0) {
-            System.out.println("No cards found in image.");
-            return "";
-        } else {
-            System.out.println("Found " + cards.size() + " cards in image.");
-        }
-        var res = new StringBuilder();
+        var res = new StringBuilder("");
         for (int i = 0; i < cards.size(); i++) {
             var card = cards.get(i);
             var name = card.recognizeName();
-            System.out.println("Recognizing name from card: " + name);
             res.append(name);
             if (i != cards.size() - 1) {
                 res.append("");
@@ -256,10 +226,8 @@ public class Main {
     public static List<Card> splitIntoCards(BufferedImage img) throws IOException {
         var res = new ArrayList<Card>();
         for (int i = 0; i < 5; i++) {
-            int cardNum = i + 1;
             int x = FIRST_CARD_X + i * (CARD_WIDTH + X_OFFSET);
             int y = FIRST_CARD_Y;
-            System.out.println("Splitting card #" + (i + 1) + " at coordinates: x=" + x + ", y=" + y);
             BufferedImage cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
             if (i > 0) {
                 int iterations = 0;
@@ -268,8 +236,6 @@ public class Main {
                 do {
                     p = new Color(cardImg.getRGB(0, CARD_HEIGHT / 2));
                     dColor = CardColor.pix(p);
-                    System.out.println("For card #" + cardNum + "color: " + dColor + "Pixel color: " + p
-                            + " at coordinate: x=" + x + ", y=" + y);
                     if (dColor == CardColor.BLACK) {
                         x++;
                         iterations++;
@@ -277,24 +243,11 @@ public class Main {
                     }
                 } while (dColor == CardColor.BLACK && iterations < 20);
             }
-            var card = new Card(cardImg, "card_" + cardNum);
+            var card = new Card(cardImg);
             if (card.valid()) {
-                saveImg(cardImg, "card_" + cardNum + ".png");
-                System.out.println("Valid card: #" + cardNum);
                 res.add(card);
-            } else {
-                System.out.println("Invalid card: #" + cardNum);
             }
         }
         return res;
-    }
-
-    public static void saveImg(BufferedImage img, String name) throws IOException {
-        File debugDir = new File("./debug");
-        if (!debugDir.exists()) {
-            debugDir.mkdir();
-        }
-        File outputfile = new File("./debug/" + name);
-        ImageIO.write(img, "png", outputfile);
     }
 }
