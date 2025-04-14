@@ -265,7 +265,6 @@ public class Main {
                 saveImg(cardImg, "card_" + cardNum + ".png");
                 System.out.println("Valid card: #" + cardNum);
                 res.add(card);
-                break;
             } else {
                 System.out.println("Invalid card: #" + cardNum);
             }
