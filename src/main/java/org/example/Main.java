@@ -18,8 +18,8 @@ public class Main {
         ANY;
 
         public static CardColor pix(Color pix) {
-            if (pix.getRed() >= 190 && (pix.getRed() - pix.getGreen()) > 50
-                    && (pix.getRed() - pix.getBlue()) > 50) {
+            if (pix.getRed() >= 90 && (pix.getRed() - pix.getGreen()) > 40
+                    && (pix.getRed() - pix.getBlue()) > 40) {
                 return RED;
             } else if (pix.getRed() >= 250 && pix.getGreen() >= 250
                     && pix.getBlue() >= 250 || (pix.getRed() == 120 && pix.getGreen() == 120 && pix.getBlue() == 120)) {
@@ -64,7 +64,7 @@ public class Main {
                     g.drawImage(img, 0, 0, null);
                     g.dispose();
                     debugImage.setRGB(x, y, Color.GREEN.getRGB());
-                    saveImg(debugImage, "unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
+                    saveImg(debugImage, "./debug/unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
                     return false;
                 }
             }
@@ -176,7 +176,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/6cKc2c8s8h.png");
+        File f = new File("./imgs_marked/7dJc6sAh5s.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
