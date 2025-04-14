@@ -24,9 +24,9 @@ public class Main {
             } else if (pix.getRed() >= 250 && pix.getGreen() >= 250
                     && pix.getBlue() >= 250 || (pix.getRed() == 120 && pix.getGreen() == 120 && pix.getBlue() == 120)) {
                 return WHITE;
-            } else if (Math.abs(pix.getRed() - pix.getGreen()) < 10
-                    && Math.abs(pix.getRed() - pix.getBlue()) < 10
-                    && Math.abs(pix.getRed() - pix.getBlue()) < 10 && pix.getRed() < 170) {
+            } else if (Math.abs(pix.getRed() - pix.getGreen()) <= 10
+                    && Math.abs(pix.getRed() - pix.getBlue()) <= 10
+                    && Math.abs(pix.getRed() - pix.getBlue()) <= 10 && pix.getRed() < 170) {
                 return BLACK;
             } else {
                 return ANY;
@@ -161,7 +161,7 @@ public class Main {
                     }),
             new AreaRecognizer("Q",
                     new XYNColors[] {
-                            new XYNColors(21, 21, BLACK_N_RED),
+                            new XYNColors(20, 20, BLACK_N_RED),
                             new XYNColors(14, 15, BLACK_N_RED),
                     }),
             new AreaRecognizer("K",
@@ -178,7 +178,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/7s10d6s.png");
+        File f = new File("./imgs_marked/6cQs10c.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
@@ -259,12 +259,30 @@ public class Main {
             BufferedImage cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
             if (i > 0) {
                 int iterations = 0;
-                while (CardColor.pix(new Color(cardImg.getRGB(0, CARD_HEIGHT / 2))) == CardColor.BLACK
-                        && iterations < 10) {
-                    x++;
-                    iterations++;
-                    cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
-                }
+                Color p;
+                CardColor dColor;
+                do {
+                    p = new Color(cardImg.getRGB(0, CARD_HEIGHT / 2));
+                    dColor = CardColor.pix(p);
+                    System.out.println("For card #" + cardNum + "color: " + dColor + "Pixel color: " + p
+                            + " at coordinate: x=" + x + ", y=" + y);
+                    if (dColor == CardColor.BLACK) {
+                        x++;
+                        iterations++;
+                        cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
+                    }
+                } while (dColor == CardColor.BLACK && iterations < 20);
+                // var p = new Color(cardImg.getRGB(0, CARD_HEIGHT / 2));
+                // var dColor = CardColor.pix(p);
+                // System.out.println();
+                // while (dColor == CardColor.BLACK
+                // && iterations < 20) {
+                // x++;
+                // iterations++;
+                // cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
+                // p = new Color(cardImg.getRGB(0, CARD_HEIGHT / 2));
+                // dColor = CardColor.pix(p);
+                // }
                 // x--;
                 // cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
             }
