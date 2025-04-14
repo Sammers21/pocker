@@ -178,7 +178,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/6cKc2c8s8h.png");
+        File f = new File("./imgs_marked/8s8dQh.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
@@ -257,10 +257,15 @@ public class Main {
             int y = FIRST_CARD_Y;
             System.out.println("Splitting card #" + (i + 1) + " at coordinates: x=" + x + ", y=" + y);
             BufferedImage cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
-            int iterations = 0;
-            while (CardColor.pix(new Color(cardImg.getRGB(0, CARD_HEIGHT / 2))) == CardColor.BLACK && iterations < 10) {
-                x++;
-                iterations++;
+            if (i > 0) {
+                int iterations = 0;
+                while (CardColor.pix(new Color(cardImg.getRGB(0, CARD_HEIGHT / 2))) == CardColor.BLACK
+                        && iterations < 10) {
+                    x++;
+                    iterations++;
+                    cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
+                }
+                x--;
                 cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
             }
             var card = new Card(cardImg, "card_" + cardNum);
@@ -280,7 +285,7 @@ public class Main {
         if (!debugDir.exists()) {
             debugDir.mkdir();
         }
-        File outputfile = new File("./debug/" +name);
+        File outputfile = new File("./debug/" + name);
         ImageIO.write(img, "png", outputfile);
     }
 }
