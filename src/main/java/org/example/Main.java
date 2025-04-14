@@ -11,7 +11,25 @@ import java.util.List;
 public class Main {
 
     enum CardColor {
-        WHITE, RED, BLACK, ANY
+        WHITE,
+        RED,
+        BLACK,
+        ANY;
+
+        public static CardColor pix(Color pix) {
+            if (pix.getRed() >= 120 && pix.getGreen() >= 120
+                    && pix.getBlue() >= 120) {
+                return WHITE;
+            } else if (pix.getRed() >= 190 && pix.getGreen() < 100
+                    && pix.getBlue() < 100) {
+                return RED;
+            } else if (pix.getRed() < 100 && pix.getGreen() < 100
+                    && pix.getBlue() < 100) {
+                return BLACK;
+            } else {
+                return ANY;
+            }
+        }
     }
 
     record Coordinate(int x, int y) {
@@ -23,14 +41,14 @@ public class Main {
                 int x = coordinate.x;
                 int y = coordinate.y;
                 if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight()) {
+                    System.out.println("Coordinate out of bounds: x=" + x + ", y=" + y + " for symbol: " + symbol);
                     return false;
                 }
-                Color pixelColor = new Color(img.getRGB(x, y));
-                if (this.color == CardColor.WHITE && pixelColor.getRed() != 255) {
-                    return false;
-                } else if (this.color == CardColor.RED && pixelColor.getRed() != 255) {
-                    return false;
-                } else if (this.color == CardColor.BLACK && pixelColor.getRed() != 0) {
+                Color pix = new Color(img.getRGB(x, y));
+                System.out.println("Pixel color: " + pix + " for symbol=" + symbol + " at coordinate: " + coordinate);
+                var p = CardColor.pix(pix);
+                if (p != color) {
+                    System.out.println("Failed to recognize symbol: " + symbol + " at coordinate: " + coordinate);
                     return false;
                 }
             }
@@ -43,10 +61,9 @@ public class Main {
     static int RANK_X = 26, RANK_Y = 48, RANK_WIDTH = 32, RANK_HEIGHT = 32;
 
     static AreaRecognizer VALID_CARD = new AreaRecognizer("CARD",
-            new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.WHITE);
+            new Coordinate[] { new Coordinate(48, 13), }, CardColor.WHITE);
 
     static AreaRecognizer[] CARD_NUMBERS = {
-            new AreaRecognizer("A", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
             new AreaRecognizer("2", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
             new AreaRecognizer("3", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
             new AreaRecognizer("4", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
@@ -58,7 +75,8 @@ public class Main {
             new AreaRecognizer("10", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
             new AreaRecognizer("J", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
             new AreaRecognizer("Q", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("K", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY)
+            new AreaRecognizer("K", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
+            new AreaRecognizer("A", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
     };
 
     static AreaRecognizer[] CARD_SUITS = {
@@ -103,13 +121,19 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        File twoC3dAh = new File("./imgs_marked/10cKhKd7h.png");
+        File twoC3dAh = new File("./imgs_marked/2c3dAh.png");
         System.out.println("Recognizing text from image: " + recognizeText(twoC3dAh));
     }
 
     public static String recognizeText(File imageFile) throws IOException {
         var img = ImageIO.read(imageFile);
         var cards = splitIntoCards(img);
+        if (cards.size() == 0) {
+            System.out.println("No cards found in image.");
+            return "";
+        } else {
+            System.out.println("Found " + cards.size() + " cards in image.");
+        }
         var res = new StringBuilder();
         for (int i = 0; i < cards.size(); i++) {
             var card = cards.get(i);
@@ -117,40 +141,42 @@ public class Main {
             System.out.println("Recognizing name from card: " + name);
             res.append(name);
             if (i != cards.size() - 1) {
-                res.append(", ");
+                res.append("");
             }
         }
         return res.toString();
     }
 
     public static BufferedImage normalize(BufferedImage image, CardColor color) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage normalized = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = normalized.createGraphics();
-        g2d.drawImage(image, 0, 0, null);
-        g2d.dispose();
-        return normalized;
+        var top = normalize0(image, color, 0, -1);
+        var bottom = normalize0(top, color, 0, 1);
+        var left = normalize0(bottom, color, -1, 0);
+        var right = normalize0(left, color, 1, 0);
+        return right;
     }
 
-    public static List<Card> splitIntoCards(BufferedImage img) {
+    // Removes the full lines of color from the image in the given direction
+    public static BufferedImage normalize0(BufferedImage image, CardColor color, int dx, int dy) {
+        return image;
+    }
+
+    public static List<Card> splitIntoCards(BufferedImage img) throws IOException {
         var res = new ArrayList<Card>();
         for (int i = 0; i < 5; i++) {
+            int cardNum = i + 1;
             int x = FIRST_CARD_X + i * (CARD_WIDTH + X_OFFSET);
             int y = FIRST_CARD_Y;
+            System.out.println("Splitting card #" + (i + 1) + " at coordinates: x=" + x + ", y=" + y);
             BufferedImage cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
             var card = new Card(cardImg);
             if (card.valid()) {
-                cardImg = normalize(img, CardColor.BLACK);
+                saveImg(cardImg, "card_" + cardNum + ".png");
+                System.out.println("Valid card: #" + cardNum);
+                cardImg = normalize(cardImg, CardColor.BLACK);
                 cardImg = normalize(cardImg, CardColor.WHITE);
                 res.add(new Card(cardImg));
             } else {
-                System.out.println("Invalid card: #" + i);
-            }
-            try {
-                saveImg(cardImg, "card_" + (i + 1) + ".png");
-            } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Invalid card: #" + cardNum);
             }
         }
         return res;
