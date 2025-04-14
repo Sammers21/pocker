@@ -47,10 +47,13 @@ public class FirstCardTest {
         String firstCard = name.substring(0, end);
         String recognizedName = "";
         try {
-            recognizedName = Main.recognizeText(file).substring(0, end);
-        } catch (IOException e) {
+            recognizedName = Main.recognizeText(file);
+        } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false, "Failed with testing file " + name);
+        }
+        if (recognizedName.length() != end) {
+            recognizedName = recognizedName.substring(0, 2);
         }
         boolean equals = recognizedName.equals(firstCard);
         if (!equals) {

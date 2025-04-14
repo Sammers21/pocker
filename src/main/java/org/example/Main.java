@@ -64,6 +64,11 @@ public class Main {
                     g.drawImage(img, 0, 0, null);
                     g.dispose();
                     debugImage.setRGB(x, y, Color.GREEN.getRGB());
+                    // create debug dir if not exists
+                    File debugDir = new File("./debug");
+                    if (!debugDir.exists()) {
+                        debugDir.mkdir();
+                    }
                     saveImg(debugImage, "./debug/unrecognized_" + symbol + "_coordinates_x_" + x + "_y_" + y + ".png");
                     return false;
                 }
@@ -99,7 +104,7 @@ public class Main {
             new AreaRecognizer("4",
                     new XYNColors[] {
                             new XYNColors(3, 16, BLACK_N_RED),
-                            new XYNColors(8, 8, BLACK_N_RED),
+                            new XYNColors(7, 7, BLACK_N_RED),
                             new XYNColors(13, 21, BLACK_N_RED),
                             new XYNColors(14, 3, BLACK_N_RED),
                             new XYNColors(13, 7, BLACK_N_RED),
@@ -176,7 +181,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/7dJc6sAh5s.png");
+        File f = new File("./imgs_marked/4hAs2d2s.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
