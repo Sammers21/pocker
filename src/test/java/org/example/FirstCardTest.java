@@ -41,9 +41,9 @@ public class FirstCardTest {
     public Boolean testFile(File file) {
         String name = file.getName();
         System.out.println("File name: " + name);
-        int end = 1;
+        int end = 2;
         if (name.startsWith("1")) {
-            end = 2;
+            end = 3;
         }
         String firstCard = name.substring(0, end);
         System.out.println("first card name:" + firstCard);
