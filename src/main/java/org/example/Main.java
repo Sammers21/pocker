@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
 
@@ -17,12 +18,12 @@ public class Main {
         ANY;
 
         public static CardColor pix(Color pix) {
-            if (pix.getRed() >= 120 && pix.getGreen() >= 120
+            if (pix.getRed() >= 190 && (pix.getRed() - pix.getGreen()) > 50
+                    && (pix.getRed() - pix.getBlue()) > 50) {
+                return RED;
+            } else if (pix.getRed() >= 120 && pix.getGreen() >= 120
                     && pix.getBlue() >= 120) {
                 return WHITE;
-            } else if (pix.getRed() >= 190 && pix.getGreen() < 100
-                    && pix.getBlue() < 100) {
-                return RED;
             } else if (pix.getRed() < 100 && pix.getGreen() < 100
                     && pix.getBlue() < 100) {
                 return BLACK;
@@ -32,12 +33,12 @@ public class Main {
         }
     }
 
-    record Coordinate(int x, int y) {
+    record XYNColors(int x, int y, Set<CardColor> colors) {
     }
 
-    record AreaRecognizer(String symbol, Coordinate[] coordinates, CardColor color) {
+    record AreaRecognizer(String symbol, XYNColors[] coordinates) {
         public boolean recognize(BufferedImage img) {
-            for (Coordinate coordinate : coordinates) {
+            for (XYNColors coordinate : coordinates) {
                 int x = coordinate.x;
                 int y = coordinate.y;
                 if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight()) {
@@ -47,8 +48,12 @@ public class Main {
                 Color pix = new Color(img.getRGB(x, y));
                 System.out.println("Pixel color: " + pix + " for symbol=" + symbol + " at coordinate: " + coordinate);
                 var p = CardColor.pix(pix);
-                if (p != color) {
-                    System.out.println("Failed to recognize symbol: " + symbol + " at coordinate: " + coordinate);
+                if (coordinate.colors.contains(p)) {
+                    System.out.println("Recognized symbol: " + symbol + " at coordinate: " + coordinate
+                            + " recognized color: " + p);
+                } else {
+                    System.out.println("Unrecognized symbol: " + symbol + " at coordinate: " + coordinate
+                            + " recognized color: " + p);
                     return false;
                 }
             }
@@ -58,35 +63,122 @@ public class Main {
 
     static int CARD_WIDTH = 63, CARD_HEIGHT = 87, X_OFFSET = 7, FIRST_CARD_X = 143, FIRST_CARD_Y = 586;
     static int SUIT_X = 26, SUIT_Y = 48, SUIT_WIDTH = 32, SUIT_HEIGHT = 32;
-    static int RANK_X = 26, RANK_Y = 48, RANK_WIDTH = 32, RANK_HEIGHT = 32;
+    static int RANK_X = 9, RANK_Y = 6, RANK_WIDTH = 24, RANK_HEIGHT = 24;
+    static Set<CardColor> BLACK_N_RED = Set.of(CardColor.BLACK, CardColor.RED);
 
     static AreaRecognizer VALID_CARD = new AreaRecognizer("CARD",
-            new Coordinate[] { new Coordinate(48, 13), }, CardColor.WHITE);
+            new XYNColors[] { new XYNColors(48, 13, Set.of(CardColor.WHITE)), });
 
     static AreaRecognizer[] CARD_NUMBERS = {
-            new AreaRecognizer("2", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("3", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("4", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("5", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("6", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("7", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("8", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("9", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("10", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("J", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("Q", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("K", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
-            new AreaRecognizer("A", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.ANY),
+            new AreaRecognizer("2",
+                    new XYNColors[] {
+                            new XYNColors(3, 20, BLACK_N_RED),
+                            new XYNColors(13, 20, BLACK_N_RED),
+                            new XYNColors(3, 7, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("3",
+                    new XYNColors[] {
+                            new XYNColors(3, 2, BLACK_N_RED),
+                            new XYNColors(7, 10, BLACK_N_RED),
+                            new XYNColors(14, 2, BLACK_N_RED),
+                            new XYNColors(14, 16, BLACK_N_RED),
+                            new XYNColors(2, 7, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("4",
+                    new XYNColors[] {
+                            new XYNColors(3, 16, BLACK_N_RED),
+                            new XYNColors(8, 8, BLACK_N_RED),
+                            new XYNColors(13, 21, BLACK_N_RED),
+                            new XYNColors(14, 3, BLACK_N_RED),
+                    }),
+            new AreaRecognizer("5",
+                    new XYNColors[] {
+                            new XYNColors(3, 2, BLACK_N_RED),
+                            new XYNColors(7, 10, BLACK_N_RED),
+                            new XYNColors(14, 2, BLACK_N_RED),
+                            new XYNColors(14, 16, BLACK_N_RED),
+                            new XYNColors(4, 6, BLACK_N_RED),
+                            new XYNColors(2, 15, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("6",
+                    new XYNColors[] {
+                            new XYNColors(4, 5, BLACK_N_RED),
+                            new XYNColors(10, 2, BLACK_N_RED),
+                            new XYNColors(9, 10, BLACK_N_RED),
+                            new XYNColors(14, 7, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("7",
+                    new XYNColors[] {
+                            new XYNColors(2, 2, BLACK_N_RED),
+                            new XYNColors(15, 2, BLACK_N_RED),
+                            new XYNColors(5, 21, BLACK_N_RED),
+                            new XYNColors(2, 16, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("8",
+                    new XYNColors[] {
+                            new XYNColors(8, 2, BLACK_N_RED),
+                            new XYNColors(3, 20, BLACK_N_RED),
+                            new XYNColors(13, 20, BLACK_N_RED),
+                            new XYNColors(3, 7, BLACK_N_RED),
+                            new XYNColors(2, 11, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("9",
+                    new XYNColors[] {
+                            new XYNColors(3, 15, Set.of(CardColor.WHITE)),
+                            new XYNColors(3, 8, BLACK_N_RED),
+                            new XYNColors(8, 12, BLACK_N_RED),
+                            new XYNColors(7, 21, BLACK_N_RED),
+                    }),
+            new AreaRecognizer("10",
+                    new XYNColors[] {
+                            new XYNColors(3, 2, BLACK_N_RED),
+                            new XYNColors(14, 1, BLACK_N_RED),
+                            new XYNColors(15, 20, BLACK_N_RED),
+                            new XYNColors(3, 20, BLACK_N_RED),
+                            new XYNColors(13, 14, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("J",
+                    new XYNColors[] {
+                            new XYNColors(11, 3, BLACK_N_RED),
+                            new XYNColors(11, 17, BLACK_N_RED),
+                            new XYNColors(6, 21, BLACK_N_RED),
+                            new XYNColors(3, 6, Set.of(CardColor.WHITE)),
+                    }),
+            new AreaRecognizer("Q",
+                    new XYNColors[] {
+                            new XYNColors(21, 21, BLACK_N_RED),
+                            new XYNColors(14, 15, BLACK_N_RED),
+                    }),
+            new AreaRecognizer("K",
+                    new XYNColors[] {
+                            new XYNColors(2, 1, BLACK_N_RED),
+                            new XYNColors(6, 13, BLACK_N_RED),
+                            new XYNColors(12, 13, BLACK_N_RED),
+                            new XYNColors(17, 2, BLACK_N_RED),
+                    }),
+            new AreaRecognizer("A",
+                    new XYNColors[] {
+                            new XYNColors(8, 15, BLACK_N_RED),
+                    })
+            // new AreaRecognizer("A", new XYNColors[] { new XYNColors(0, 0) },
+            // Set.of(CardColor.BLACK, CardColor.RED)),
     };
+
+    public static void main(String[] args) throws IOException {
+        File f = new File("./imgs_marked/4hJhQc.png");
+        System.out.println("Recognizing text from image: " + recognizeText(f));
+    }
 
     static AreaRecognizer[] CARD_SUITS = {
-            new AreaRecognizer("h", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.RED),
-            new AreaRecognizer("d", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.RED),
-            new AreaRecognizer("c", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.BLACK),
-            new AreaRecognizer("s", new Coordinate[] { new Coordinate(0, 0), new Coordinate(0, 1) }, CardColor.BLACK)
+            new AreaRecognizer("h",
+                    new XYNColors[] { new XYNColors(16, 19, Set.of(CardColor.RED)),
+                            new XYNColors(0, 1, Set.of(CardColor.RED)) }),
+            new AreaRecognizer("d", new XYNColors[] { new XYNColors(16, 1, Set.of(CardColor.RED)), }),
+            new AreaRecognizer("c", new XYNColors[] { new XYNColors(13, 2, Set.of(CardColor.BLACK)), }),
+            new AreaRecognizer("s", new XYNColors[] { new XYNColors(9, 12, Set.of(CardColor.BLACK)), }),
     };
 
-    record Card(BufferedImage image) {
+    record Card(BufferedImage image, String name) {
         public String recognizeName() throws IOException {
             var suit = recognizeSuit();
             var rank = recognizeRank();
@@ -99,30 +191,25 @@ public class Main {
 
         private String recognizeSuit() throws IOException {
             var suit = image.getSubimage(SUIT_X, SUIT_Y, SUIT_WIDTH, SUIT_HEIGHT);
-            var normalized = normalize(suit, CardColor.WHITE);
+            saveImg(suit, name + "_suit.png");
             for (var cardSuit : CARD_SUITS) {
-                if (cardSuit.recognize(normalized)) {
+                if (cardSuit.recognize(suit)) {
                     return cardSuit.symbol;
                 }
             }
-            return "N";
+            return "n";
         }
 
-        private String recognizeRank() {
+        private String recognizeRank() throws IOException {
             var rank = image.getSubimage(RANK_X, RANK_Y, RANK_WIDTH, RANK_HEIGHT);
-            var normalized = normalize(rank, CardColor.WHITE);
+            saveImg(rank, name + "_rank.png");
             for (var cardNumber : CARD_NUMBERS) {
-                if (cardNumber.recognize(normalized)) {
+                if (cardNumber.recognize(rank)) {
                     return cardNumber.symbol;
                 }
             }
             return "N";
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        File twoC3dAh = new File("./imgs_marked/2c3dAh.png");
-        System.out.println("Recognizing text from image: " + recognizeText(twoC3dAh));
     }
 
     public static String recognizeText(File imageFile) throws IOException {
@@ -147,19 +234,6 @@ public class Main {
         return res.toString();
     }
 
-    public static BufferedImage normalize(BufferedImage image, CardColor color) {
-        var top = normalize0(image, color, 0, -1);
-        var bottom = normalize0(top, color, 0, 1);
-        var left = normalize0(bottom, color, -1, 0);
-        var right = normalize0(left, color, 1, 0);
-        return right;
-    }
-
-    // Removes the full lines of color from the image in the given direction
-    public static BufferedImage normalize0(BufferedImage image, CardColor color, int dx, int dy) {
-        return image;
-    }
-
     public static List<Card> splitIntoCards(BufferedImage img) throws IOException {
         var res = new ArrayList<Card>();
         for (int i = 0; i < 5; i++) {
@@ -168,13 +242,11 @@ public class Main {
             int y = FIRST_CARD_Y;
             System.out.println("Splitting card #" + (i + 1) + " at coordinates: x=" + x + ", y=" + y);
             BufferedImage cardImg = img.getSubimage(x, y, CARD_WIDTH, CARD_HEIGHT);
-            var card = new Card(cardImg);
+            var card = new Card(cardImg, "card_" + cardNum);
             if (card.valid()) {
                 saveImg(cardImg, "card_" + cardNum + ".png");
                 System.out.println("Valid card: #" + cardNum);
-                cardImg = normalize(cardImg, CardColor.BLACK);
-                cardImg = normalize(cardImg, CardColor.WHITE);
-                res.add(new Card(cardImg));
+                res.add(card);
             } else {
                 System.out.println("Invalid card: #" + cardNum);
             }
