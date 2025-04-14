@@ -22,7 +22,7 @@ public class Main {
                     && (pix.getRed() - pix.getBlue()) > 50) {
                 return RED;
             } else if (pix.getRed() >= 250 && pix.getGreen() >= 250
-                    && pix.getBlue() >= 250) {
+                    && pix.getBlue() >= 250 || (pix.getRed() == 120 && pix.getGreen() == 120 && pix.getBlue() == 120)) {
                 return WHITE;
             } else if (Math.abs(pix.getRed() - pix.getGreen()) < 10
                     && Math.abs(pix.getRed() - pix.getBlue()) < 10
@@ -174,7 +174,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/8s7h5c.png");
+        File f = new File("./imgs_marked/4sJdKdKc.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
