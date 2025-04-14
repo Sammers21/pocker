@@ -113,6 +113,7 @@ public class Main {
                             new XYNColors(14, 16, BLACK_N_RED),
                             new XYNColors(3, 6, BLACK_N_RED),
                             new XYNColors(2, 15, Set.of(CardColor.WHITE)),
+                            new XYNColors(13, 6, Set.of(CardColor.WHITE)),
                     }),
             new AreaRecognizer("6",
                     new XYNColors[] {
@@ -177,7 +178,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/3c7d5h.png");
+        File f = new File("./imgs_marked/3cJc9dAh.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
