@@ -77,7 +77,7 @@ public class Main {
         }
     }
 
-    static int CARD_WIDTH = 63, CARD_HEIGHT = 87, X_OFFSET = 7, FIRST_CARD_X = 143, FIRST_CARD_Y = 586;
+    static int CARD_WIDTH = 63, CARD_HEIGHT = 87, X_OFFSET = 8, FIRST_CARD_X = 143, FIRST_CARD_Y = 586;
     static int SUIT_X = 26, SUIT_Y = 48, SUIT_WIDTH = 32, SUIT_HEIGHT = 32;
     static int RANK_X = 9, RANK_Y = 6, RANK_WIDTH = 24, RANK_HEIGHT = 24;
     static Set<CardColor> BLACK_N_RED = Set.of(CardColor.BLACK, CardColor.RED);
@@ -181,7 +181,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        File f = new File("./imgs_marked/4hAs2d2s.png");
+        File f = new File("./imgs_marked/7s10d6s.png");
         System.out.println("Recognizing text from image: " + recognizeText(f));
     }
 
